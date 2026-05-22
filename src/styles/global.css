@@ -1,0 +1,626 @@
+/* =========================================================
+   Claude-inspired editorial system
+   ---------------------------------------------------------
+   Palette: cream + clay (terracotta accent)
+   Type:    Fraunces (display serif, variable axes)
+            Inter (body sans, variable)
+            JetBrains Mono (mono micro)
+   Layout:  Asymmetric, generous whitespace, hairline rules
+   ========================================================= */
+
+/* @import deve precedere qualsiasi altra direttiva CSS (spec). */
+@import '@fontsource-variable/fraunces/index.css';
+@import '@fontsource-variable/inter/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Cream tones */
+    --paper:        245 241 232;  /* #F5F1E8 background primary */
+    --paper-deep:   239 233 219;  /* #EFE9DB surface */
+    --paper-soft:   249 246 239;  /* #F9F6EF subtle highlight */
+    --ash:          235 228 210;  /* #EBE4D2 darker surface */
+
+    /* Ink (cool-warm near-black) */
+    --ink:           26  25  21;  /* #1A1915 primary */
+    --ink-deep:      14  13  10;  /* near-black for hero blocks */
+    --ink-soft:      71  68  60;  /* #47443C body soft */
+    --ink-mute:     121 116 102;  /* #797466 muted */
+    --ink-faint:    166 160 144;  /* #A6A090 faint */
+
+    /* Accent: clay/terracotta (Claude-like) */
+    --clay:         193  95  60;  /* #C15F3C primary accent */
+    --clay-deep:    150  72  43;  /* #96482B deep */
+    --clay-soft:    232 198 175;  /* #E8C6AF soft */
+    --clay-wash:    245 224 207;  /* #F5E0CF wash */
+
+    /* Sage (secondary accent for variety) */
+    --sage:         107 124 105;  /* #6B7C69 */
+    --sage-soft:    198 207 191;  /* #C6CFBF */
+
+    /* Lines & strokes */
+    --hairline:      26  25  21 / 0.10;
+    --hairline-soft: 26  25  21 / 0.06;
+    --hairline-hard: 26  25  21 / 0.18;
+
+    /* Semantic */
+    --bg: var(--paper);
+    --surface: var(--paper-deep);
+    --accent: var(--clay);
+    --accent-deep: var(--clay-deep);
+    --accent-soft: var(--clay-soft);
+  }
+
+  .dark {
+    --paper:        20  19  15;  /* #14130F espresso */
+    --paper-deep:   27  25  20;  /* #1B1914 */
+    --paper-soft:   31  28  22;  /* #1F1C16 */
+    --ash:          39  35  28;  /* #27231C */
+
+    --ink:         245 241 232;
+    --ink-deep:    255 253 250;
+    --ink-soft:    206 199 184;
+    --ink-mute:    155 149 134;
+    --ink-faint:   105 100  88;
+
+    --clay:        232 130  93;  /* #E8825D warmer for dark */
+    --clay-deep:   251 184 154;
+    --clay-soft:    66  44  32;
+    --clay-wash:    44  29  21;
+
+    --sage:        163 177 161;
+    --sage-soft:    51  61  49;
+
+    --hairline:     245 241 232 / 0.08;
+    --hairline-soft: 245 241 232 / 0.04;
+    --hairline-hard: 245 241 232 / 0.16;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: rgb(var(--paper));
+    color: rgb(var(--ink));
+  }
+
+  body {
+    font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+    background: rgb(var(--paper));
+    color: rgb(var(--ink));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11' on, 'ss03' on, 'cv02' on;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Fraunces Variable', Fraunces, Georgia, serif;
+    color: rgb(var(--ink));
+    font-feature-settings: 'ss01' on, 'ss02' on, 'liga' on, 'dlig' on;
+  }
+
+  ::selection {
+    background: rgb(var(--clay) / 0.22);
+    color: rgb(var(--ink-deep));
+  }
+
+  /* View transition smoothness */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer components {
+
+  /* ---------- Layout helpers ---------- */
+  .container-x {
+    @apply mx-auto w-full px-6 md:px-10 lg:px-14;
+    max-width: 1320px;
+  }
+
+  .container-narrow {
+    @apply mx-auto w-full px-6 md:px-10;
+    max-width: 920px;
+  }
+
+  /* ---------- Hairlines (Claude-style sottilissimi) ---------- */
+  .rule {
+    height: 1px;
+    background: rgb(var(--hairline));
+    border: none;
+  }
+  .rule-soft {
+    height: 1px;
+    background: rgb(var(--hairline-soft));
+    border: none;
+  }
+
+  /* ---------- Eyebrow (micro-label) ---------- */
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 text-[11px] font-medium uppercase;
+    letter-spacing: 0.18em;
+    color: rgb(var(--ink-mute));
+    font-family: 'Inter Variable', sans-serif;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    background: rgb(var(--clay));
+  }
+  .eyebrow-center {
+    @apply justify-center;
+  }
+  .eyebrow-center::before { display: none; }
+  .eyebrow-center::after {
+    content: '';
+    margin-left: 0.5rem;
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    background: rgb(var(--clay));
+  }
+
+  /* ---------- Buttons (più premium) ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 text-[14px] font-medium tracking-tight;
+    border-radius: 9999px;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    line-height: 1;
+    will-change: transform;
+  }
+  .btn-primary {
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    box-shadow: inset 0 0 0 1px rgb(var(--ink));
+  }
+  .btn-primary:hover {
+    background: rgb(var(--ink-deep));
+    transform: translateY(-1px);
+  }
+  .btn-accent {
+    background: rgb(var(--clay));
+    color: white;
+  }
+  .btn-accent:hover {
+    background: rgb(var(--clay-deep));
+    transform: translateY(-1px);
+  }
+  .btn-outline {
+    background: transparent;
+    color: rgb(var(--ink));
+    box-shadow: inset 0 0 0 1px rgb(var(--hairline-hard));
+  }
+  .btn-outline:hover {
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    box-shadow: inset 0 0 0 1px rgb(var(--ink));
+  }
+  .btn-ghost {
+    background: transparent;
+    color: rgb(var(--ink));
+  }
+  .btn-ghost:hover { color: rgb(var(--clay-deep)); }
+
+  .btn-arrow {
+    @apply inline-flex items-center gap-1.5;
+  }
+  .btn-arrow svg {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-arrow:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* ---------- Links ---------- */
+  .link-line {
+    @apply relative inline-block;
+    color: rgb(var(--ink));
+    background-image: linear-gradient(to right, currentColor 0%, currentColor 100%);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    padding-bottom: 1px;
+    transition: color 0.2s;
+  }
+  .link-line:hover {
+    color: rgb(var(--clay-deep));
+  }
+
+  .link-underline {
+    @apply relative inline-block;
+    background-image: linear-gradient(to right, currentColor 0%, currentColor 100%);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0 1px;
+    padding-bottom: 1px;
+    transition: background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
+  }
+  .link-underline:hover { background-size: 100% 1px; }
+
+  /* ---------- Display typography (editoriale, monumentale) ---------- */
+  .display {
+    font-family: 'Fraunces Variable', serif;
+    font-size: clamp(2.8rem, 7vw, 6.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    font-variation-settings: 'SOFT' 25, 'WONK' 0, 'opsz' 144;
+    font-weight: 400;
+  }
+  .display em, .display .italic-serif {
+    font-style: italic;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    color: rgb(var(--clay-deep));
+    font-weight: 400;
+  }
+
+  .display-md {
+    font-family: 'Fraunces Variable', serif;
+    font-size: clamp(2rem, 4.5vw, 3.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    font-variation-settings: 'SOFT' 30, 'opsz' 96;
+    font-weight: 400;
+  }
+  .display-md em, .display-md .italic-serif {
+    font-style: italic;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 96;
+    color: rgb(var(--clay-deep));
+  }
+
+  .display-sm {
+    font-family: 'Fraunces Variable', serif;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.018em;
+    font-variation-settings: 'SOFT' 40, 'opsz' 72;
+    font-weight: 400;
+  }
+
+  /* Numbers display (per metriche grandi) */
+  .num-display {
+    font-family: 'Fraunces Variable', serif;
+    font-feature-settings: 'tnum' on, 'ss01' on;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'SOFT' 20, 'opsz' 120;
+  }
+
+  /* ---------- Chapter numeral (rivista) ---------- */
+  .chapter {
+    font-family: 'Fraunces Variable', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: rgb(var(--ink-mute));
+    font-variation-settings: 'opsz' 36, 'SOFT' 80;
+  }
+
+  /* ---------- Tag (Claude-style chip) ---------- */
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-[12px] font-medium;
+    background: rgb(var(--paper-soft));
+    color: rgb(var(--ink-soft));
+    box-shadow: inset 0 0 0 1px rgb(var(--hairline-hard));
+    font-family: 'Inter Variable', sans-serif;
+    letter-spacing: -0.005em;
+  }
+  .chip-clay {
+    background: rgb(var(--clay-wash));
+    color: rgb(var(--clay-deep));
+    box-shadow: inset 0 0 0 1px rgb(var(--clay) / 0.18);
+  }
+  .chip-dot::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgb(var(--clay));
+  }
+
+  /* ---------- Card (rifinita, hairline) ---------- */
+  .card {
+    background: rgb(var(--paper-soft));
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: inset 0 0 0 1px rgb(var(--hairline));
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card:hover {
+    box-shadow: inset 0 0 0 1px rgb(var(--hairline-hard));
+    transform: translateY(-2px);
+  }
+
+  .card-dark {
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    border-radius: 1.25rem;
+  }
+  .card-dark h2, .card-dark h3 { color: rgb(var(--paper)); }
+
+  /* ---------- Editorial prose ---------- */
+  .prose-claude {
+    color: rgb(var(--ink-soft));
+    font-size: 1.0625rem;
+    line-height: 1.78;
+  }
+  .prose-claude > * + * { margin-top: 1.1em; }
+  .prose-claude h2 {
+    @apply font-serif;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+    margin-top: 3rem;
+    margin-bottom: 0.6rem;
+    color: rgb(var(--ink));
+    font-variation-settings: 'SOFT' 35, 'opsz' 60;
+  }
+  .prose-claude h3 {
+    @apply font-serif;
+    font-size: 1.3rem;
+    line-height: 1.3;
+    margin-top: 2.2rem;
+    margin-bottom: 0.4rem;
+    color: rgb(var(--ink));
+  }
+  .prose-claude ul, .prose-claude ol { padding-left: 0; list-style: none; }
+  .prose-claude ul li, .prose-claude ol li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .prose-claude ul li::before {
+    content: '';
+    position: absolute;
+    left: 0.1rem;
+    top: 0.85em;
+    width: 0.65rem;
+    height: 1px;
+    background: rgb(var(--clay));
+  }
+  .prose-claude ol { counter-reset: items; }
+  .prose-claude ol li { counter-increment: items; }
+  .prose-claude ol li::before {
+    content: counter(items, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    font-family: 'Fraunces Variable', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: rgb(var(--clay-deep));
+  }
+  .prose-claude blockquote {
+    @apply font-serif italic;
+    font-size: 1.4rem;
+    line-height: 1.45;
+    color: rgb(var(--ink));
+    border-left: 2px solid rgb(var(--clay));
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    margin: 2rem 0;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 60;
+  }
+  .prose-claude a {
+    color: rgb(var(--ink));
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--clay));
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s, color 0.2s;
+  }
+  .prose-claude a:hover {
+    color: rgb(var(--clay-deep));
+    text-decoration-color: rgb(var(--clay-deep));
+  }
+  .prose-claude hr {
+    border: none;
+    height: 1px;
+    background: rgb(var(--hairline));
+    margin: 2.5rem 0;
+  }
+  .prose-claude strong { color: rgb(var(--ink-deep)); font-weight: 500; }
+  .prose-claude code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92em;
+    background: rgb(var(--paper-deep));
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+
+  /* Dropcap editoriale */
+  .dropcap > p:first-of-type::first-letter {
+    font-family: 'Fraunces Variable', serif;
+    float: left;
+    font-size: 4.5em;
+    line-height: 0.85;
+    margin: 0.06em 0.12em 0 -0.04em;
+    color: rgb(var(--clay-deep));
+    font-variation-settings: 'SOFT' 80, 'opsz' 144;
+    font-style: italic;
+  }
+
+  /* ---------- Form ---------- */
+  .field-label {
+    @apply block text-[13px] font-medium mb-2;
+    color: rgb(var(--ink));
+    letter-spacing: -0.005em;
+  }
+  .field-input, .field-select, .field-textarea {
+    @apply w-full px-4 py-3.5 text-[15px];
+    background: rgb(var(--paper-soft));
+    box-shadow: inset 0 0 0 1px rgb(var(--hairline-hard));
+    border-radius: 0.75rem;
+    color: rgb(var(--ink));
+    transition: all 0.2s;
+    border: none;
+    outline: none;
+  }
+  .field-input::placeholder,
+  .field-textarea::placeholder { color: rgb(var(--ink-faint)); }
+  .field-input:focus, .field-select:focus, .field-textarea:focus {
+    box-shadow: inset 0 0 0 1.5px rgb(var(--ink));
+    background: rgb(var(--paper));
+  }
+  .field-textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
+
+  /* ---------- Marquee strip ---------- */
+  .marquee {
+    overflow: hidden;
+    position: relative;
+    border-top: 1px solid rgb(var(--hairline));
+    border-bottom: 1px solid rgb(var(--hairline));
+    padding: 1.25rem 0;
+    background: rgb(var(--paper));
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Fraunces Variable', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: rgb(var(--ink));
+    white-space: nowrap;
+    font-variation-settings: 'SOFT' 40, 'opsz' 72;
+    display: inline-flex;
+    align-items: center;
+    gap: 3rem;
+  }
+  .marquee-item em {
+    font-style: italic;
+    color: rgb(var(--clay-deep));
+    font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  }
+  .marquee-item::after {
+    content: '✦';
+    color: rgb(var(--clay));
+    font-size: 0.75em;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ---------- Spotlight (numero grande + descrizione) ---------- */
+  .spotlight-stat {
+    border-top: 1px solid rgb(var(--hairline));
+    padding-top: 1.25rem;
+  }
+  .spotlight-stat .num {
+    @apply num-display;
+    color: rgb(var(--ink));
+  }
+  .spotlight-stat .num em {
+    font-style: italic;
+    color: rgb(var(--clay-deep));
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 120;
+  }
+  .spotlight-stat .lbl {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgb(var(--ink-mute));
+    line-height: 1.5;
+    max-width: 18ch;
+  }
+
+  /* ---------- Logo simbolico ---------- */
+  .logomark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    font-family: 'Fraunces Variable', serif;
+    font-style: italic;
+    font-size: 18px;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 36;
+  }
+  .logomark::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgb(var(--clay));
+  }
+
+  /* ---------- Asymmetric grid helpers ---------- */
+  .grid-editorial {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+@layer utilities {
+  .text-ink         { color: rgb(var(--ink)); }
+  .text-ink-soft    { color: rgb(var(--ink-soft)); }
+  .text-ink-mute    { color: rgb(var(--ink-mute)); }
+  .text-ink-faint   { color: rgb(var(--ink-faint)); }
+  .text-clay        { color: rgb(var(--clay)); }
+  .text-clay-deep   { color: rgb(var(--clay-deep)); }
+
+  .bg-paper         { background: rgb(var(--paper)); }
+  .bg-paper-soft    { background: rgb(var(--paper-soft)); }
+  .bg-paper-deep    { background: rgb(var(--paper-deep)); }
+  .bg-ash           { background: rgb(var(--ash)); }
+  .bg-ink           { background: rgb(var(--ink)); }
+  .bg-ink-deep      { background: rgb(var(--ink-deep)); }
+  .bg-clay          { background: rgb(var(--clay)); }
+  .bg-clay-wash     { background: rgb(var(--clay-wash)); }
+
+  .border-hair      { border-color: rgb(var(--hairline)); }
+  .border-hair-soft { border-color: rgb(var(--hairline-soft)); }
+  .border-hair-hard { border-color: rgb(var(--hairline-hard)); }
+
+  /* Reveal on scroll */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+
+  /* Soft glow accent (per dietro testi monumentali) */
+  .glow-paper::before {
+    content: '';
+    position: absolute;
+    inset: -40% -10% auto auto;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle at 50% 50%, rgb(var(--clay) / 0.10), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .dark .glow-paper::before {
+    background: radial-gradient(circle at 50% 50%, rgb(var(--clay) / 0.16), transparent 60%);
+  }
+
+  /* Grain (texture leggera) */
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: '';
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .dark .grain::after { opacity: 0.05; mix-blend-mode: screen; }
+}
