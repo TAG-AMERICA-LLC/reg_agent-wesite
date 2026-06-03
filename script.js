@@ -156,27 +156,65 @@
     onPar();
   }
 
+  // ---- Guide TOC scroll-spy + smooth scroll
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  if (tocLinks.length) {
+    const targets = tocLinks
+      .map((a) => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
+
+    tocLinks.forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          const y = el.getBoundingClientRect().top + window.scrollY - 88;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+          history.replaceState(null, '', '#' + id);
+        }
+      });
+    });
+
+    const spy = () => {
+      const pos = window.scrollY + 120;
+      let active = targets[0];
+      for (const t of targets) {
+        if (t.offsetTop <= pos) active = t;
+      }
+      tocLinks.forEach((a) =>
+        a.classList.toggle('is-active', a.getAttribute('href') === '#' + (active && active.id))
+      );
+    };
+    window.addEventListener('scroll', spy, { passive: true });
+    spy();
+  }
+
   // =============================================================
   //   TWEAKS PANEL — typography swap
   // =============================================================
   const FONTS = {
-    'geist':         { label: 'Geist',              stack: "'Geist', 'Inter', system-ui, sans-serif",      note: 'modern · default' },
-    'schibsted':     { label: 'Schibsted Grotesk',  stack: "'Schibsted Grotesk', system-ui, sans-serif",   note: 'editorial · sans' },
-    'onest':         { label: 'Onest',              stack: "'Onest', 'Inter', system-ui, sans-serif",      note: 'soft · friendly' },
-    'manrope':       { label: 'Manrope',            stack: "'Manrope', system-ui, sans-serif",             note: 'clean · neutral' },
-    'space-grotesk': { label: 'Space Grotesk',      stack: "'Space Grotesk', system-ui, sans-serif",       note: 'tech · confident' },
-    'dm-sans':       { label: 'DM Sans',            stack: "'DM Sans', system-ui, sans-serif",             note: 'utilitarian · refined' },
-    'instrument':    { label: 'Instrument Serif',   stack: "'Instrument Serif', Georgia, serif",           note: 'luxe · serif' },
-    'newsreader':    { label: 'Newsreader',         stack: "'Newsreader', Georgia, serif",                 note: 'editorial · serif' },
+    'hanken':        { label: 'Hanken Grotesk',     stack: "'Hanken Grotesk', 'Inter', system-ui, sans-serif", note: 'professional · default' },
+    'jakarta':       { label: 'Plus Jakarta Sans',  stack: "'Plus Jakarta Sans', system-ui, sans-serif",       note: 'corporate · trusted' },
+    'sora':          { label: 'Sora',               stack: "'Sora', system-ui, sans-serif",                    note: 'geometric · sharp' },
+    'geist':         { label: 'Geist',              stack: "'Geist', 'Inter', system-ui, sans-serif",          note: 'neutral · clean' },
+    'space-grotesk': { label: 'Space Grotesk',      stack: "'Space Grotesk', system-ui, sans-serif",           note: 'tech · confident' },
+    'manrope':       { label: 'Manrope',            stack: "'Manrope', system-ui, sans-serif",                 note: 'soft · modern' },
+  };
+  const ACCENTS = {
+    'blue':    { label: 'Blue',   clay: '34 98 240',  clayDeep: '26 76 200',  claySoft: '188 211 255', clayWash: '237 243 255' },
+    'navy':    { label: 'Navy',   clay: '30 64 140',  clayDeep: '18 44 100',  claySoft: '180 198 235', clayWash: '235 240 250' },
+    'azure':   { label: 'Azure',  clay: '14 132 220', clayDeep: '10 104 180', claySoft: '186 224 250', clayWash: '232 245 254' },
+    'teal':    { label: 'Teal',   clay: '13 148 160', clayDeep: '10 116 126', claySoft: '180 226 230', clayWash: '232 248 249' },
   };
   const TYPE_SCALE = {
-    'tight':   { label: 'Tight',     value: '-0.04em' },
-    'normal':  { label: 'Standard',  value: '-0.025em' },
+    'tight':   { label: 'Tight',     value: '-0.035em' },
+    'normal':  { label: 'Standard',  value: '-0.022em' },
     'open':    { label: 'Open',      value: '-0.01em' },
   };
 
-  const PERSIST_KEY = 'meridiano:tweaks:v2';
-  const defaults = { font: 'geist', tracking: 'tight' };
+  const PERSIST_KEY = 'meridiano:tweaks:v3';
+  const defaults = { font: 'hanken', tracking: 'tight', accent: 'blue' };
   let state;
   try {
     state = Object.assign({}, defaults, JSON.parse(localStorage.getItem(PERSIST_KEY) || '{}'));
@@ -184,13 +222,20 @@
     if (!FONTS[state.font]) state.font = defaults.font;
   } catch (e) { state = { ...defaults }; }
 
-  // Clear v1 key (migration cleanup)
-  try { localStorage.removeItem('meridiano:tweaks'); } catch (e) {}
+  // Clear old keys (migration cleanup)
+  try { localStorage.removeItem('meridiano:tweaks'); localStorage.removeItem('meridiano:tweaks:v2'); } catch (e) {}
 
   // Apply on load
   const apply = () => {
-    document.documentElement.style.setProperty('--font-display', FONTS[state.font]?.stack || FONTS.newsreader.stack);
-    document.documentElement.style.setProperty('--display-tracking', TYPE_SCALE[state.tracking]?.value || TYPE_SCALE.tight.value);
+    const root = document.documentElement.style;
+    root.setProperty('--font-display', FONTS[state.font]?.stack || FONTS.hanken.stack);
+    root.setProperty('--font-accent', FONTS[state.font]?.stack || FONTS.hanken.stack);
+    root.setProperty('--display-tracking', TYPE_SCALE[state.tracking]?.value || TYPE_SCALE.tight.value);
+    const a = ACCENTS[state.accent] || ACCENTS.blue;
+    root.setProperty('--clay', a.clay);
+    root.setProperty('--clay-deep', a.clayDeep);
+    root.setProperty('--clay-soft', a.claySoft);
+    root.setProperty('--clay-wash', a.clayWash);
   };
   apply();
 
@@ -233,6 +278,18 @@
       </section>
 
       <section class="tp-section">
+        <div class="tp-label">Accent colour</div>
+        <div class="tp-swatches">
+          ${Object.entries(ACCENTS).map(([key, a]) => `
+            <button class="tp-swatch" data-accent="${key}" title="${a.label}">
+              <span class="tp-swatch-dot" style="background: rgb(${a.clay});"></span>
+              <span class="tp-swatch-name">${a.label}</span>
+            </button>
+          `).join('')}
+        </div>
+      </section>
+
+      <section class="tp-section">
         <div class="tp-label">Headline tracking</div>
         <div class="tp-segmented">
           ${Object.entries(TYPE_SCALE).map(([key, t]) => `
@@ -251,8 +308,16 @@
     const refresh = () => {
       panel.querySelectorAll('.tp-font').forEach(b => b.classList.toggle('is-active', b.dataset.font === state.font));
       panel.querySelectorAll('.tp-seg').forEach(b => b.classList.toggle('is-active', b.dataset.tracking === state.tracking));
+      panel.querySelectorAll('.tp-swatch').forEach(b => b.classList.toggle('is-active', b.dataset.accent === state.accent));
     };
     refresh();
+
+    panel.querySelectorAll('.tp-swatch').forEach((b) => {
+      b.addEventListener('click', () => {
+        state.accent = b.dataset.accent;
+        apply(); refresh(); persist();
+      });
+    });
 
     panel.querySelectorAll('.tp-font').forEach((b) => {
       b.addEventListener('click', () => {
