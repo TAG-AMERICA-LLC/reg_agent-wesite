@@ -45,13 +45,37 @@
     </div>
   </section>
 
-  <aside class="login-preview" aria-label="Anteprima area cliente">
-    <div class="login-preview-card">
-      <span class="kicker">Mailroom</span>
-      <div class="login-preview-row"><span>Nuova posta</span><strong>3</strong></div>
-      <div class="login-preview-row"><span>In revisione</span><strong>5</strong></div>
-      <div class="login-preview-row is-alert"><span>Urgente</span><strong>1</strong></div>
-      <p>La posta dubbia resta in standby finché l'amministratore non approva lo smistamento.</p>
+  <aside class="login-preview" aria-label="Anteprima area riservata">
+    <div class="login-showcase">
+      <div class="login-window" aria-hidden="true">
+        <div class="login-window-bar">
+          <span class="login-dot"></span><span class="login-dot"></span><span class="login-dot"></span>
+          <span class="login-window-title">Meridiano · Mailroom</span>
+        </div>
+        <div class="login-window-body">
+          <div class="login-stat-row">
+            <div class="login-stat"><span>Nuova</span><strong>3</strong></div>
+            <div class="login-stat"><span>Revisione</span><strong>5</strong></div>
+            <div class="login-stat is-alert"><span>Urgente</span><strong>1</strong></div>
+          </div>
+          <div class="login-doc">
+            <span class="login-doc-icon">FL</span>
+            <div class="login-doc-main"><strong>Florida Dept. of State</strong><small>Annual Report · urgente</small></div>
+            <span class="login-doc-tag">98%</span>
+          </div>
+          <div class="login-doc">
+            <span class="login-doc-icon">IRS</span>
+            <div class="login-doc-main"><strong>Internal Revenue Service</strong><small>Comunicazione fiscale</small></div>
+            <span class="login-doc-tag">96%</span>
+          </div>
+          <div class="login-doc is-muted">
+            <span class="login-doc-icon">??</span>
+            <div class="login-doc-main"><strong>In revisione admin</strong><small>Confidenza bassa · standby</small></div>
+            <span class="login-doc-tag is-warn">61%</span>
+          </div>
+        </div>
+      </div>
+      <p class="login-showcase-note">La posta dubbia resta in standby finché un amministratore non la approva. Tu vedi solo ciò che è certo.</p>
     </div>
   </aside>
 </main>

@@ -312,6 +312,10 @@
       read: 'Letta',
       archived: 'Archiviata',
     };
+    const confChip = (score) => {
+      const tier = score >= 90 ? 'high' : score >= 70 ? 'med' : 'low';
+      return `<span class="mail-conf mail-conf--${tier}">Confidenza ${score}%</span>`;
+    };
     const list = document.querySelector('[data-mail-list]');
     const detail = document.querySelector('[data-mail-detail]');
     const search = document.querySelector('[data-mail-search]');
@@ -375,7 +379,7 @@
             <div class="mail-meta">
               <span>Ricevuta ${formatDate(item.receivedAt)}</span>
               <span>${escapeHtml(item.documentType)}</span>
-              <span>${item.confidenceScore == null ? escapeHtml(item.control || 'Approvata da admin') : `Confidenza ${item.confidenceScore}%`}</span>
+              ${item.confidenceScore == null ? `<span>${escapeHtml(item.control || 'Approvata da admin')}</span>` : confChip(item.confidenceScore)}
             </div>
           </div>
         </article>
@@ -552,10 +556,62 @@
   // ---- Admin mailroom
   const adminApp = document.querySelector('.admin-app');
   if (adminApp) {
+    const fallbackAdmin = [
+      {
+        id: 'DOC-2026-0604-014', initials: 'FL', sender: 'Florida Department of State',
+        subject: 'Annual Report reminder', summary: 'Annual Report reminder per Italia Group LLC. Scadenza operativa: 1 maggio.',
+        receivedAt: '2026-06-04T09:42:00+02:00', documentType: 'Avviso statale', confidenceScore: 98,
+        clientId: 'italia-group', publicationStatus: 'published', previewTitle: 'Annual Report Notice',
+        previewBody: 'Italia Group LLC\nSarasota, FL', detailTitle: 'Annual Report reminder',
+        assignmentReason: 'Corrispondenza esatta su ragione sociale, indirizzo registered agent e storico annual report.',
+        control: 'Automatico, alta confidenza',
+      },
+      {
+        id: 'DOC-2026-0603-009', initials: 'IRS', sender: 'Internal Revenue Service',
+        subject: 'Comunicazione fiscale federale', summary: "Conferma ricezione comunicazione collegata all'EIN aziendale.",
+        receivedAt: '2026-06-03T16:15:00+02:00', documentType: 'IRS / fiscale', confidenceScore: 96,
+        clientId: 'italia-group', publicationStatus: 'published', previewTitle: 'IRS Notice',
+        previewBody: 'Italia Group LLC\nFederal tax correspondence', detailTitle: 'Conferma IRS',
+        assignmentReason: 'Corrispondenza tra EIN aziendale, ragione sociale e storico fiscale del cliente.',
+        control: 'Automatico, alta confidenza',
+      },
+      {
+        id: 'DOC-2026-0602-031', initials: 'LX', sender: 'Lex & Partners LLP',
+        subject: 'Notifica legale', summary: 'Comunicazione legale con ragione sociale simile a due clienti distinti.',
+        receivedAt: '2026-06-02T14:05:00+02:00', documentType: 'Legale', confidenceScore: 61,
+        clientId: null, publicationStatus: 'needs_review', previewTitle: 'Legal Notice',
+        previewBody: 'Italia Holding LLC?\nService of process', detailTitle: 'Notifica legale da verificare',
+        assignmentReason: 'Nome simile a più clienti ("Italia Group" vs "Italia Holding"): confidenza bassa, richiede scelta manuale.',
+        control: 'Da verificare',
+      },
+      {
+        id: 'DOC-2026-0531-021', initials: 'BK', sender: 'Relay Financial',
+        subject: 'Comunicazione bancaria', summary: 'Comunicazione bancaria ordinaria per il conto business.',
+        receivedAt: '2026-05-31T11:08:00+02:00', documentType: 'Banca', confidenceScore: 74,
+        clientId: 'sunbelt-trade', publicationStatus: 'needs_review', previewTitle: 'Relay Financial',
+        previewBody: 'Sunbelt Trade LLC\nBusiness account notice', detailTitle: 'Comunicazione bancaria',
+        assignmentReason: 'Indirizzo coincidente ma intestazione parzialmente illeggibile: conferma consigliata.',
+        control: 'Da verificare',
+      },
+      {
+        id: 'DOC-2026-0528-017', initials: '??', sender: 'Mittente non riconosciuto',
+        subject: 'Busta senza intestazione leggibile', summary: 'OCR non ha estratto un destinatario affidabile.',
+        receivedAt: '2026-05-28T08:50:00+02:00', documentType: 'Amministrativo', confidenceScore: 32,
+        clientId: null, publicationStatus: 'needs_review', previewTitle: 'Documento non identificato',
+        previewBody: 'Intestazione illeggibile\nScansione a bassa qualità', detailTitle: 'Documento da identificare',
+        assignmentReason: 'Confidenza OCR molto bassa: nessun cliente associato in automatico.',
+        control: 'Da verificare',
+      },
+    ];
+    const fallbackClients = [
+      { id: 'italia-group', company: 'Italia Group LLC' },
+      { id: 'sunbelt-trade', company: 'Sunbelt Trade LLC' },
+      { id: 'adriatic-labs', company: 'Adriatic Labs LLC' },
+    ];
     const adminState = {
-      items: [],
-      clients: [],
-      selectedId: null,
+      items: fallbackAdmin,
+      clients: fallbackClients,
+      selectedId: fallbackAdmin[0].id,
       filter: 'all',
     };
     const adminList = document.querySelector('[data-admin-list]');
@@ -576,6 +632,10 @@
       year: 'numeric',
     }).format(new Date(value));
     const clientName = (clientId) => adminState.clients.find((client) => client.id === clientId)?.company || 'Non assegnata';
+    const confChip = (score) => {
+      const tier = score >= 90 ? 'high' : score >= 70 ? 'med' : 'low';
+      return `<span class="mail-conf mail-conf--${tier}">Confidenza ${score}%</span>`;
+    };
     const selectedAdminItem = () => adminState.items.find((item) => item.id === adminState.selectedId) || adminState.items[0];
     const visibleAdminItems = () => adminState.items.filter((item) => adminState.filter === 'all' || item.publicationStatus === adminState.filter);
     const setAdminMetric = (selector, value) => {
@@ -609,7 +669,7 @@
               <span>${formatDate(item.receivedAt)}</span>
               <span>${escapeHtml(item.documentType)}</span>
               <span>${escapeHtml(clientName(item.clientId))}</span>
-              <span>${item.confidenceScore == null ? 'Manuale' : `Confidenza ${item.confidenceScore}%`}</span>
+              ${item.confidenceScore == null ? '<span>Manuale</span>' : confChip(item.confidenceScore)}
             </div>
           </div>
         </article>
@@ -662,6 +722,7 @@
       renderAdminDetail();
     };
     const loadAdmin = () => {
+      if (window.location.protocol === 'file:') { renderAdmin(); return; }
       fetch('/api/admin/mail', { credentials: 'same-origin' })
         .then((res) => {
           if (res.status === 401 || res.status === 403) {
@@ -729,6 +790,7 @@
       }
     });
     loadAdmin();
+    renderAdmin();
   }
 
   // ---- Parallax for hero images (light)
