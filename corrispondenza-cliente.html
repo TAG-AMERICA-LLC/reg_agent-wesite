@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Corrispondenza cliente — Meridiano</title>
+<meta name="description" content="Area riservata Meridiano per consultare la corrispondenza aziendale scansionata e approvata." />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="canonical" href="https://example.com/corrispondenza-cliente.html" />
+<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+<meta name="theme-color" content="#fafbfd" />
+<link rel="stylesheet" href="styles.css" />
+<script>
+try {
+  if (sessionStorage.getItem('meridiano:demo-auth') !== 'ok') {
+    window.location.replace('login.html?next=corrispondenza-cliente.html');
+  }
+} catch (e) {
+  window.location.replace('login.html?next=corrispondenza-cliente.html');
+}
+</script>
+</head>
+<body class="mail-app">
+
+<header class="client-header">
+  <div class="wrap client-nav">
+    <a href="index.html" class="brand" aria-label="Meridiano, home">
+      <span class="mark">M</span>
+      <span class="word">Meridiano</span>
+    </a>
+    <div class="client-account" aria-label="Account cliente">
+      <span class="client-company">Italia Group LLC</span>
+      <span class="client-pill">Area riservata</span>
+      <a href="login.html" class="btn btn-outline" data-demo-logout style="padding:10px 16px; font-size:13px;">Esci</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="client-hero">
+    <div class="wrap">
+      <div class="client-topline">
+        <nav class="client-breadcrumb" aria-label="Percorso">
+          <a href="index.html">Home</a>
+          <span>/</span>
+          <span>Corrispondenza</span>
+        </nav>
+        <span class="kicker">Ultimo aggiornamento: 04 giugno 2026, 09:42</span>
+      </div>
+      <div class="client-title-row">
+        <div>
+          <span class="kicker">Registered Agent Mailroom</span>
+          <h1 class="client-title">La tua <em>corrispondenza</em></h1>
+          <p class="client-lead">Qui trovi solo la posta già attribuita con sicurezza alla tua società o approvata da un amministratore. I casi dubbi restano in revisione e non vengono pubblicati.</p>
+        </div>
+        <div class="client-actions">
+          <button class="btn btn-outline" type="button">Segnala problema</button>
+          <button class="btn btn-primary" type="button">Scarica archivio</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="client-workspace">
+    <div class="wrap">
+      <div class="mail-metrics" aria-label="Riepilogo corrispondenza">
+        <article class="mail-metric">
+          <span>Nuova posta</span>
+          <strong>3</strong>
+          <small>2 documenti ricevuti oggi</small>
+        </article>
+        <article class="mail-metric">
+          <span>In revisione</span>
+          <strong>5</strong>
+          <small>Non ancora visibili al cliente</small>
+        </article>
+        <article class="mail-metric is-alert">
+          <span>Urgenti</span>
+          <strong>1</strong>
+          <small>Richiede risposta entro 7 giorni</small>
+        </article>
+        <article class="mail-metric">
+          <span>Archiviate</span>
+          <strong>48</strong>
+          <small>Consultabili per anno</small>
+        </article>
+      </div>
+
+      <div class="mail-layout">
+        <aside class="mail-sidebar" aria-label="Filtri corrispondenza">
+          <div class="mail-panel">
+            <div class="mail-panel-head">
+              <span class="kicker">Filtri</span>
+              <button type="button">Reset</button>
+            </div>
+            <label class="mail-field">
+              <span>Cerca</span>
+              <input type="search" value="" placeholder="Mittente, tipo, parola chiave" />
+            </label>
+            <div class="mail-filter-group" aria-label="Stato">
+              <button class="is-active" type="button">Tutta</button>
+              <button type="button">Nuova</button>
+              <button type="button">Urgente</button>
+              <button type="button">Archiviata</button>
+            </div>
+            <label class="mail-field">
+              <span>Tipo documento</span>
+              <select>
+                <option>Tutti i documenti</option>
+                <option>Avviso statale</option>
+                <option>IRS / fiscale</option>
+                <option>Banca</option>
+                <option>Legale</option>
+              </select>
+            </label>
+            <label class="mail-field">
+              <span>Periodo</span>
+              <select>
+                <option>Ultimi 30 giorni</option>
+                <option>Ultimi 90 giorni</option>
+                <option>Anno corrente</option>
+                <option>Archivio completo</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="mail-panel mail-process">
+            <span class="kicker">Prevenzione errori</span>
+            <ol>
+              <li>Scanner invia alla inbox software dedicata.</li>
+              <li>OCR estrae ragione sociale, indirizzo, mittente e riferimenti.</li>
+              <li>Il matching confronta alias, suite, EIN e storico cliente.</li>
+              <li>Se la confidenza è bassa, la posta resta in standby.</li>
+              <li>L'admin approva o riassegna, con audit log.</li>
+            </ol>
+          </div>
+        </aside>
+
+        <section class="mail-list" aria-label="Lista corrispondenza">
+          <div class="mail-list-head">
+            <div>
+              <span class="kicker">Inbox cliente</span>
+              <h2>Documenti pubblicati</h2>
+            </div>
+            <span class="mail-safe-note">5 casi in revisione admin esclusi da questa vista</span>
+          </div>
+
+          <article class="mail-row is-selected">
+            <div class="mail-icon">FL</div>
+            <div class="mail-row-main">
+              <div class="mail-row-title">
+                <h3>Florida Department of State</h3>
+                <span class="mail-status urgent">Urgente</span>
+              </div>
+              <p>Annual Report reminder per Italia Group LLC. Scadenza operativa: 1 maggio.</p>
+              <div class="mail-meta">
+                <span>Ricevuta 04/06/2026</span>
+                <span>Avviso statale</span>
+                <span>Confidenza 98%</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="mail-row">
+            <div class="mail-icon">IRS</div>
+            <div class="mail-row-main">
+              <div class="mail-row-title">
+                <h3>Internal Revenue Service</h3>
+                <span class="mail-status new">Nuova</span>
+              </div>
+              <p>Conferma ricezione comunicazione fiscale federale collegata all'EIN aziendale.</p>
+              <div class="mail-meta">
+                <span>Ricevuta 03/06/2026</span>
+                <span>IRS / fiscale</span>
+                <span>Confidenza 96%</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="mail-row">
+            <div class="mail-icon">BK</div>
+            <div class="mail-row-main">
+              <div class="mail-row-title">
+                <h3>Relay Financial</h3>
+                <span class="mail-status new">Nuova</span>
+              </div>
+              <p>Comunicazione bancaria ordinaria per il conto business.</p>
+              <div class="mail-meta">
+                <span>Ricevuta 31/05/2026</span>
+                <span>Banca</span>
+                <span>Approvata da admin</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="mail-row">
+            <div class="mail-icon">RA</div>
+            <div class="mail-row-main">
+              <div class="mail-row-title">
+                <h3>Registered Agent Office</h3>
+                <span class="mail-status read">Letta</span>
+              </div>
+              <p>Nota interna di conferma scansione e archiviazione documento societario.</p>
+              <div class="mail-meta">
+                <span>Ricevuta 18/05/2026</span>
+                <span>Amministrativo</span>
+                <span>Confidenza 100%</span>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <aside class="mail-detail" aria-label="Dettaglio documento selezionato">
+          <div class="mail-panel">
+            <div class="mail-detail-head">
+              <span class="mail-status urgent">Urgente</span>
+              <span class="kicker">DOC-2026-0604-014</span>
+            </div>
+            <div class="mail-preview" aria-label="Anteprima documento">
+              <div class="mail-paper">
+                <span>Florida Department of State</span>
+                <strong>Annual Report Notice</strong>
+                <p>Italia Group LLC<br/>Sarasota, FL</p>
+              </div>
+            </div>
+            <h2>Annual Report reminder</h2>
+            <p class="mail-detail-copy">Documento assegnato a Italia Group LLC tramite corrispondenza esatta su ragione sociale, indirizzo registered agent e storico annual report.</p>
+            <dl class="mail-facts">
+              <div><dt>Mittente</dt><dd>Florida Department of State</dd></div>
+              <div><dt>Ricezione</dt><dd>04 giugno 2026</dd></div>
+              <div><dt>Stato</dt><dd>Pubblicato</dd></div>
+              <div><dt>Controllo</dt><dd>Automatico, alta confidenza</dd></div>
+            </dl>
+            <div class="mail-detail-actions">
+              <button class="btn btn-primary" type="button">Apri PDF</button>
+              <button class="btn btn-outline" type="button">Chiedi supporto</button>
+            </div>
+          </div>
+
+          <div class="mail-panel mail-admin-note">
+            <span class="kicker">Casi dubbi</span>
+            <p>Se il sistema trova nomi simili, indirizzi incompleti, OCR poco leggibile o documenti legali sensibili, il documento entra in standby. Solo l'amministratore può pubblicarlo, riassegnarlo o scartarlo.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

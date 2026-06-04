@@ -6,7 +6,7 @@ import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.example.com', // sostituire con [DOMINIO]
+  site: 'https://example.com', // sostituire con il dominio reale prima del go-live
   integrations: [
     tailwind({ applyBaseStyles: false }),
     react(),

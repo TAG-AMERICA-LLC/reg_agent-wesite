@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login area riservata — Meridiano</title>
+<meta name="description" content="Login demo per provare l'area riservata Meridiano." />
+<meta name="robots" content="noindex,nofollow" />
+<link rel="canonical" href="https://example.com/login.html" />
+<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+<meta name="theme-color" content="#fafbfd" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="login-app">
+
+<main class="login-shell">
+  <section class="login-panel" aria-labelledby="login-title">
+    <a href="index.html" class="brand" aria-label="Meridiano, home">
+      <span class="mark">M</span>
+      <span class="word">Meridiano</span>
+    </a>
+
+    <div class="login-copy">
+      <span class="kicker">Area riservata demo</span>
+      <h1 id="login-title">Accedi alla <em>corrispondenza</em></h1>
+      <p>Credenziali di prova: username <strong>admin</strong>, password <strong>admin</strong>. Questo accesso è solo una simulazione lato browser.</p>
+    </div>
+
+    <form class="login-form" data-demo-login>
+      <label class="mail-field">
+        <span>Username</span>
+        <input name="username" type="text" autocomplete="username" placeholder="admin" required />
+      </label>
+      <label class="mail-field">
+        <span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" placeholder="admin" required />
+      </label>
+      <p class="login-error" data-login-error role="alert"></p>
+      <button type="submit" class="btn btn-primary btn-lg">Entra nell'area cliente <span class="arr">→</span></button>
+    </form>
+
+    <div class="login-note">
+      <strong>Nota sicurezza</strong>
+      <span>Per la produzione serviranno autenticazione reale, ruoli, sessioni server-side, log accessi e protezione documenti.</span>
+    </div>
+  </section>
+
+  <aside class="login-preview" aria-label="Anteprima area cliente">
+    <div class="login-preview-card">
+      <span class="kicker">Mailroom</span>
+      <div class="login-preview-row"><span>Nuova posta</span><strong>3</strong></div>
+      <div class="login-preview-row"><span>In revisione</span><strong>5</strong></div>
+      <div class="login-preview-row is-alert"><span>Urgente</span><strong>1</strong></div>
+      <p>La posta dubbia resta in standby finché l'amministratore non approva lo smistamento.</p>
+    </div>
+  </aside>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

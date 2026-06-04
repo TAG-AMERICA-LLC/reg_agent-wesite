@@ -18,7 +18,7 @@ export default function LeadForm() {
     setStatus('loading');
     setTimeout(() => {
       setStatus('success');
-      setMsg('Richiesta ricevuta. Ti rispondiamo entro [N] giorni lavorativi.');
+      setMsg('Richiesta ricevuta. Ti rispondiamo entro un giorno lavorativo.');
       form.reset();
     }, 700);
   };
@@ -98,7 +98,7 @@ export default function LeadForm() {
         </label>
         <label className="flex gap-3 text-[13px] leading-relaxed cursor-pointer" style={{ color: 'rgb(var(--ink-soft))' }}>
           <input name="marketing" type="checkbox" className="mt-0.5" style={{ accentColor: 'rgb(var(--ink))' }} />
-          <span>Acconsento a ricevere comunicazioni commerciali da [NOME BRAND]. <span style={{ color: 'rgb(var(--ink-faint))' }}>(opzionale)</span></span>
+          <span>Acconsento a ricevere comunicazioni commerciali da Meridiano. <span style={{ color: 'rgb(var(--ink-faint))' }}>(opzionale)</span></span>
         </label>
       </div>
 
@@ -116,7 +116,7 @@ export default function LeadForm() {
 
       <p className="text-[12px] leading-relaxed" style={{ color: 'rgb(var(--ink-faint))' }}>
         Inviando il form accetti il <a href="/disclaimer/" className="link-line" style={{ color: 'rgb(var(--ink-soft))' }}>Disclaimer</a>.
-        L'invio non crea un rapporto professionale con [NOME BRAND] o con il partner Florida.
+        L'invio non crea un rapporto professionale con Meridiano o con il partner Florida.
       </p>
     </form>
   );

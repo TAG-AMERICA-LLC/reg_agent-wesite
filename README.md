@@ -1,4 +1,4 @@
-# [NOME BRAND] — Sito v2 (Astro 4 + React)
+# Meridiano — Sito v2 (Astro 4 + React)
 
 Riscrittura editoriale del portale informativo e commerciale per il company setup in Florida.
 **Non è uno studio legale.**
@@ -93,6 +93,7 @@ site-v2/
 ## Installazione locale
 
 Richiede **Node 18+** (consigliato 20 LTS).
+Il repository include `.nvmrc` con Node 20.
 
 ```bash
 cd site-v2
@@ -107,24 +108,30 @@ npm run build        # output statico in dist/
 npm run preview      # serve dist/ in locale per verificarlo
 ```
 
-## Placeholder da sostituire
+## Audit tecnico corrente
 
-Stessa lista della v1. Sostituire in `src/**` e nei file in `public/`:
+- `npm run build` fallisce con Node `18.13.0`: Astro richiede almeno `18.14.1`. Usare Node 20 LTS.
+- Gli HTML pubblici in root sono la fonte effettivamente servita; `src/pages` non è presente, quindi le ottimizzazioni SEO sono applicate agli HTML statici.
+- `npm audit` segnala vulnerabilità su Astro/Vite/esbuild. Il fix completo richiede upgrade breaking ad Astro 6 e va pianificato come intervento separato dopo il riallineamento delle sorgenti.
+- `https://example.com` è il dominio canonico provvisorio usato per canonical, Open Graph, robots e sitemap. Sostituirlo con il dominio reale prima del go-live.
 
-| Placeholder | Note |
+## Dati da completare prima del go-live
+
+Il brand è impostato su Meridiano. Restano da completare i dati reali di pubblicazione:
+
+| Dato | Note |
 |---|---|
-| `[NOME BRAND]` | Nome commerciale (anche in `Header.astro`, `Footer.astro`, og-default.svg) |
-| `[DOMINIO]` | Aggiornare anche in `astro.config.mjs` → `site` |
-| `[PARTNER FLORIDA]` | Nome partner USA |
-| `[RAGIONE SOCIALE GESTORE]`, `[INDIRIZZO]`, `[SEDE]` | Dati societari |
-| `[EMAIL]`, `[TELEFONO]`, `[INDIRIZZO IT]` | Recapiti |
-| `[PREZZO BASE]`, `[PREZZO]`, `[VALUTA]` | Listino |
-| `[N] giorni lavorativi`, `[DATA]` | Tempistiche e date policy |
+| Dominio reale | Aggiornare `astro.config.mjs`, canonical, sitemap, robots e Open Graph. |
+| Partner Florida | Nome partner USA e accordi di trattamento dati. |
+| Dati societari | Ragione sociale, indirizzo registrato, sede e dati fiscali. |
+| Recapiti | Email aziendale, email privacy, telefono e indirizzo italiano, se presente. |
+| Listino | Prezzi, valuta e condizioni dei pacchetti. |
+| Policy | Date di efficacia, rappresentante UE e testi revisionati legalmente. |
 
 Grep di controllo:
 
 ```bash
-grep -r "\[NOME BRAND\]" src public --include="*.astro" --include="*.tsx" --include="*.ts" --include="*.md"
+rg "\.example|href=\"#\"|\[.+\]" *.html src public astro.config.mjs
 ```
 
 ## Form contatti

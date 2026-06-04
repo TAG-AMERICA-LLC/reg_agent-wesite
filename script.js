@@ -142,6 +142,36 @@
     });
   }
 
+  // ---- Demo login for private prototype
+  const loginForm = document.querySelector('[data-demo-login]');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(loginForm);
+      const username = String(data.get('username') || '').trim();
+      const password = String(data.get('password') || '');
+      const error = loginForm.querySelector('[data-login-error]');
+      if (username === 'admin' && password === 'admin') {
+        try { sessionStorage.setItem('meridiano:demo-auth', 'ok'); } catch (err) {}
+        const params = new URLSearchParams(window.location.search);
+        const requestedNext = params.get('next') || 'corrispondenza-cliente.html';
+        const next = requestedNext === 'corrispondenza-cliente.html' ? requestedNext : 'corrispondenza-cliente.html';
+        window.location.href = next;
+        return;
+      }
+      if (error) {
+        error.textContent = 'Credenziali non valide. Usa admin / admin per la demo.';
+        error.classList.add('is-visible');
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-demo-logout]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try { sessionStorage.removeItem('meridiano:demo-auth'); } catch (err) {}
+    });
+  });
+
   // ---- Parallax for hero images (light)
   const parallaxEls = document.querySelectorAll('[data-parallax]');
   if (parallaxEls.length) {
