@@ -1,4 +1,4 @@
-// MERIDIANO — shared interactions
+// TAG AMERICA — shared interactions
 
 // Suppress benign ResizeObserver browser noise (Chrome quirk, not a real bug)
 (function suppressROW() {
@@ -109,7 +109,7 @@
   const bar = document.querySelector('.cookie-bar');
   if (bar) {
     try {
-      if (localStorage.getItem('meridiano:cookies') === 'ok') {
+      if (localStorage.getItem('tagamerica:cookies') === 'ok') {
         bar.classList.add('is-hidden');
       } else {
         setTimeout(() => bar.classList.add('is-visible'), 600);
@@ -117,28 +117,99 @@
     } catch (e) {}
     bar.querySelectorAll('[data-cookie]').forEach((b) =>
       b.addEventListener('click', () => {
-        try { localStorage.setItem('meridiano:cookies', 'ok'); } catch (e) {}
+        try { localStorage.setItem('tagamerica:cookies', 'ok'); } catch (e) {}
         bar.classList.add('is-hidden');
       })
     );
   }
 
-  // ---- Form mock
+  // ---- Lead form: invio email reale via EmailJS (Gmail), con fallback mailto
   const form = document.querySelector('[data-lead-form]');
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = new FormData(form);
+      const err = form.querySelector('[data-form-error]');
+      const showErr = (msg) => { if (err) { err.textContent = msg; err.style.display = 'block'; } };
+      if (err) err.style.display = 'none';
+
       if (!data.get('privacy')) {
-        const err = form.querySelector('[data-form-error]');
-        if (err) {
-          err.textContent = 'Devi accettare la Privacy Policy per inviare la richiesta.';
-          err.style.display = 'block';
-        }
+        showErr('Devi accettare la Privacy Policy per inviare la richiesta.');
         return;
       }
-      const fs = form.querySelector('[data-form-stage]');
-      if (fs) fs.dataset.stage = 'success';
+
+      const fs = document.querySelector('[data-form-stage]');
+      const btn = form.querySelector('button[type="submit"]');
+      const cfg = window.TAG_MAIL || {};
+      const whenLabels = { morning: 'Mattina (9-12)', afternoon: 'Pomeriggio (14-18)', evening: 'Sera (18-20)', any: 'Indifferente' };
+      const lead = {
+        nome: String(data.get('name') || ''),
+        email: String(data.get('email') || ''),
+        telefono: String(data.get('phone') || '') || '—',
+        richiesta: String(data.get('type') || ''),
+        ricontatto: whenLabels[String(data.get('when') || '')] || 'Indifferente',
+        newsletter: data.get('marketing') ? 'Sì' : 'No',
+        messaggio: String(data.get('message') || ''),
+        inviato: new Intl.DateTimeFormat('it-IT', { dateStyle: 'full', timeStyle: 'short' }).format(new Date()),
+        pagina: window.location.href,
+      };
+
+      const succeed = () => { if (fs) fs.dataset.stage = 'success'; };
+
+      const configured = cfg.apiKey && cfg.apiKey !== 'BREVO_API_KEY';
+      if (configured) {
+        btn.disabled = true;
+        const prev = btn.innerHTML;
+        btn.innerHTML = 'Invio in corso…';
+        const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br/>');
+        const row = (k, v) =>
+          `<tr><td style="padding:10px 16px; font-weight:600; color:#09162B; border-bottom:1px solid #E5EAF2; white-space:nowrap; vertical-align:top;">${k}</td>` +
+          `<td style="padding:10px 16px; color:#33405A; border-bottom:1px solid #E5EAF2;">${esc(v)}</td></tr>`;
+        const htmlContent =
+          '<div style="font-family:Arial,Helvetica,sans-serif; max-width:640px; margin:0 auto;">' +
+          '<h2 style="color:#09162B; font-size:20px;">Nuova richiesta dal sito businessinflorida.it</h2>' +
+          '<table style="width:100%; border-collapse:collapse; background:#FAFBFD; border-radius:8px; font-size:14px; line-height:1.5;">' +
+          row('Nome', lead.nome) + row('Email', lead.email) + row('Telefono', lead.telefono) +
+          row('Tipo di richiesta', lead.richiesta) + row('Quando ricontattare', lead.ricontatto) +
+          row('Newsletter', lead.newsletter) + row('Messaggio', lead.messaggio) +
+          row('Inviato il', lead.inviato) + row('Pagina', lead.pagina) +
+          '</table>' +
+          '<p style="color:#7A879E; font-size:12px; margin-top:16px;">Rispondi direttamente a questa email per ricontattare il cliente (reply-to impostato).</p>' +
+          '</div>';
+        fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: { 'accept': 'application/json', 'content-type': 'application/json', 'api-key': cfg.apiKey },
+          body: JSON.stringify({
+            sender: { name: cfg.fromName || 'Modulo contatti', email: cfg.fromEmail },
+            to: [{ email: cfg.toEmail, name: 'TAG America' }],
+            replyTo: { email: lead.email, name: lead.nome },
+            subject: 'Richiesta dal sito — ' + lead.richiesta + ' — ' + lead.nome,
+            htmlContent: htmlContent,
+          }),
+        })
+          .then((res) => { if (!res.ok) throw new Error('brevo ' + res.status); succeed(); })
+          .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = prev;
+            showErr('Non siamo riusciti a inviare la richiesta. Riprova, o scrivici direttamente a info@businessinflorida.it.');
+          });
+      } else {
+        // Chiave non ancora configurata: apre il client email con tutti i dati precompilati
+        const body = [
+          'Nome: ' + lead.nome,
+          'Email: ' + lead.email,
+          'Telefono: ' + lead.telefono,
+          'Tipo di richiesta: ' + lead.richiesta,
+          'Quando ricontattare: ' + lead.ricontatto,
+          'Newsletter: ' + lead.newsletter,
+          '',
+          lead.messaggio,
+        ].join('\n');
+        window.location.href = 'mailto:' + (cfg.toEmail || 'info@businessinflorida.it')
+          + '?subject=' + encodeURIComponent('Richiesta dal sito — ' + lead.richiesta)
+          + '&body=' + encodeURIComponent(body);
+        succeed();
+      }
     });
   }
 
@@ -163,12 +234,12 @@
       };
       const fallbackLogin = () => {
         if (username === 'admin' && password === 'admin') {
-          try { sessionStorage.setItem('meridiano:demo-auth', 'ok'); } catch (err) {}
+          try { sessionStorage.setItem('tagamerica:demo-auth', 'ok'); } catch (err) {}
           window.location.href = next === 'admin.html' ? 'admin.html' : 'admin.html';
           return;
         }
         if (username === 'cliente' && password === 'cliente') {
-          try { sessionStorage.setItem('meridiano:demo-auth', 'ok'); } catch (err) {}
+          try { sessionStorage.setItem('tagamerica:demo-auth', 'ok'); } catch (err) {}
           window.location.href = 'corrispondenza-cliente.html';
           return;
         }
@@ -189,7 +260,7 @@
         .then((res) => {
           if (res.ok) {
             return res.json().then((body) => {
-              try { sessionStorage.setItem('meridiano:demo-auth', 'ok'); } catch (err) {}
+              try { sessionStorage.setItem('tagamerica:demo-auth', 'ok'); } catch (err) {}
               const target = allowedNext.includes(next) && (
                 (body.user?.role === 'admin' && next === 'admin.html') ||
                 (body.user?.role === 'client' && next === 'corrispondenza-cliente.html')
@@ -215,7 +286,7 @@
 
   document.querySelectorAll('[data-demo-logout]').forEach((link) => {
     link.addEventListener('click', (e) => {
-      try { sessionStorage.removeItem('meridiano:demo-auth'); } catch (err) {}
+      try { sessionStorage.removeItem('tagamerica:demo-auth'); } catch (err) {}
       if (window.location.protocol === 'file:') return;
       e.preventDefault();
       fetch('/api/logout', {
@@ -431,7 +502,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'meridiano-corrispondenza.csv';
+      a.download = 'tagamerica-corrispondenza.csv';
       a.click();
       URL.revokeObjectURL(url);
     };
@@ -864,7 +935,7 @@
     'open':    { label: 'Open',      value: '-0.01em' },
   };
 
-  const PERSIST_KEY = 'meridiano:tweaks:v3';
+  const PERSIST_KEY = 'tagamerica:tweaks:v3';
   const defaults = { font: 'hanken', tracking: 'tight', accent: 'blue' };
   let state;
   try {

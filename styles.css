@@ -1,5 +1,5 @@
 /* ============================================================
-   MERIDIANO — Editorial design system
+   TAG AMERICA — Editorial design system
    Cool white + navy + electric blue · Hanken Grotesk
    ============================================================ */
 
@@ -398,7 +398,7 @@ input, select, textarea { font: inherit; color: inherit; }
   border-radius: 50%;
   background: rgb(var(--clay));
 }
-.brand .word { letter-spacing: 0.04em; text-transform: uppercase; font-size: 15px; }
+.brand .word { letter-spacing: 0.04em; text-transform: uppercase; font-size: 15px; white-space: nowrap; }
 
 .nav-links {
   display: none;
@@ -854,11 +854,12 @@ input, select, textarea { font: inherit; color: inherit; }
   transition: all 0.25s ease;
   border: none;
   outline: none;
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
 }
 .field-input::placeholder, .field-textarea::placeholder { color: rgb(var(--ink-faint)); }
 .field-input:focus, .field-select:focus, .field-textarea:focus {
-  box-shadow: inset 0 0 0 1.5px rgb(var(--ink));
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px rgb(var(--clay)), 0 0 0 4px rgb(var(--clay) / 0.12);
   background: rgb(var(--paper));
 }
 .field-textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
@@ -1480,6 +1481,7 @@ input, select, textarea { font: inherit; color: inherit; }
 @media (min-width: 1000px) {
   .guide-layout { grid-template-columns: 240px 1fr; }
 }
+.guide-layout > * { min-width: 0; }
 .toc {
   position: sticky;
   top: 100px;
@@ -2426,6 +2428,66 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ============================================================
+   PHOTO CARD — editorial image with caption scrim
+   ============================================================ */
+.photo-card {
+  position: relative;
+  display: block;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 0;
+  background: rgb(var(--ink));
+  box-shadow: 0 40px 90px -55px rgb(var(--ink) / 0.8), inset 0 0 0 1px rgb(var(--paper) / 0.06);
+}
+.photo-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a .photo-card:hover img, .photo-card a:hover img { transform: scale(1.04); }
+.photo-card figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 56px 22px 20px;
+  background: linear-gradient(to top, rgb(7 17 33 / 0.86), rgb(7 17 33 / 0.4) 55%, transparent);
+}
+.pc-place {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: #fff;
+}
+.pc-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.7);
+  margin-top: 5px;
+}
+.pc-badge {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
+}
+
+/* ============================================================
    FLORIDA MAP — custom brand cartography
    ============================================================ */
 .fl-map {
@@ -2567,4 +2629,69 @@ image-slot {
   border-radius: 16px;
   box-shadow: inset 0 0 0 1px rgb(var(--hairline-hard));
   overflow: hidden;
+}
+
+/* ============================================================
+   MOBILE OPTIMIZATION
+   ============================================================ */
+/* iOS: usa il viewport dinamico (barra Safari che appare/scompare) */
+@supports (min-height: 100svh) {
+  .login-app, .login-shell { min-height: 100svh; }
+}
+
+@media (max-width: 800px) {
+  /* Ritmo verticale più compatto */
+  .section { padding: 64px 0; }
+  .section-sm { padding: 44px 0; }
+  .section-lg { padding: 80px 0; }
+  .section-head { margin-bottom: 44px; }
+
+  /* iOS: sotto i 16px Safari zooma al focus dei campi */
+  .field-input, .field-select, .field-textarea { font-size: 16px; }
+
+  /* Target tattile ampio per il menu */
+  .nav-toggle { width: 44px; height: 44px; }
+
+  /* Quando le colonne si impilano, niente allineamenti a destra orfani */
+  .grid-12 > [style*="text-align:right"] { text-align: left !important; }
+
+  /* Le righe flessibili vanno a capo invece di traboccare */
+  .flex { flex-wrap: wrap; }
+
+  /* Tabelle (guide + pagine legali): scorrono in orizzontale */
+  .guide-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .guide-table thead th, .guide-table tbody td { min-width: 120px; }
+
+  /* Scritta gigante del footer: non deve allargare la pagina */
+  .footer-mono { font-size: clamp(5rem, 26vw, 11rem); inset: auto 0 -20px 0; }
+
+  /* Hero interni: meno aria sopra */
+  .guide-hero { padding: 48px 0 36px; }
+}
+
+@media (max-width: 520px) {
+  /* CTA principali a tutta larghezza: più facili da toccare */
+  form .btn-lg, .quiz-result .btn-lg { width: 100%; justify-content: center; }
+
+  /* Cookie bar a filo schermo */
+  .cookie-bar { left: 12px; right: 12px; bottom: 12px; padding: 18px 20px; }
+  .cookie-bar .actions { width: 100%; }
+  .cookie-bar .actions .btn { flex: 1; justify-content: center; }
+
+  /* Card e quiz: padding ridotto */
+  .card, .card-dark { padding: 26px 22px; }
+  .quiz-opt { padding: 16px 16px; }
+
+  /* Didascalie foto più compatte */
+  .photo-card figcaption { padding: 44px 16px 16px; }
+}
+
+/* Touch: niente hover "appiccicosi" */
+@media (hover: none) {
+  .mail-row:hover:not(.is-selected) { margin: 0; padding-left: 0; padding-right: 0; background: transparent; border-radius: 0; }
+  a .photo-card:hover img { transform: none; }
 }

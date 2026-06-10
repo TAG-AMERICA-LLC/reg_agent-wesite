@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Corrispondenza cliente — Meridiano</title>
-<meta name="description" content="Area riservata Meridiano per consultare la corrispondenza aziendale scansionata e approvata." />
+<title>Corrispondenza cliente — TAG America</title>
+<meta name="description" content="Area riservata TAG America per consultare la corrispondenza aziendale scansionata e approvata." />
 <meta name="robots" content="noindex,nofollow" />
 <link rel="canonical" href="https://example.com/corrispondenza-cliente.html" />
 <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
@@ -14,7 +14,7 @@
 (function () {
   const loginUrl = 'login.html?next=corrispondenza-cliente.html';
   const hasFallbackSession = function () {
-    try { return sessionStorage.getItem('meridiano:demo-auth') === 'ok'; } catch (e) { return false; }
+    try { return sessionStorage.getItem('tagamerica:demo-auth') === 'ok'; } catch (e) { return false; }
   };
   if (window.location.protocol === 'file:') {
     if (!hasFallbackSession()) window.location.replace(loginUrl);
@@ -34,9 +34,9 @@
 
 <header class="client-header">
   <div class="wrap client-nav">
-    <a href="index.html" class="brand" aria-label="Meridiano, home">
-      <span class="mark">M</span>
-      <span class="word">Meridiano</span>
+    <a href="index.html" class="brand" aria-label="TAG America, home">
+      <span class="mark">T</span>
+      <span class="word">TAG America</span>
     </a>
     <div class="client-account" aria-label="Account cliente">
       <span class="client-company">Italia Group LLC</span>
