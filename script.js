@@ -36,6 +36,57 @@
   }
 
   // ---- Reveal on scroll
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- Stat count-up (premium detail: numbers animate in when revealed)
+  const statNums = document.querySelectorAll('.stat .num');
+  if (statNums.length && !reducedMotion && 'IntersectionObserver' in window) {
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+    const animateNum = (el) => {
+      const raw = el.textContent.trim();
+      const m = raw.match(/^(\d+)(.*)$/);
+      if (!m) return;
+      const target = parseInt(m[1], 10);
+      const suffix = m[2] || '';
+      if (!target) return; // "0" stays as-is
+      const dur = 1300;
+      const t0 = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round(easeOut(p) * target) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    const statIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateNum(entry.target);
+          statIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.6 });
+    statNums.forEach((el) => statIO.observe(el));
+  }
+
+  // ---- Cursor-reactive hero glow (desktop, motion-safe)
+  const heroGlow = document.querySelector('.glow-hero');
+  if (heroGlow && !reducedMotion && window.matchMedia('(pointer: fine)').matches) {
+    let raf = null;
+    let tx = 0, ty = 0;
+    window.addEventListener('pointermove', (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 48;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 32;
+      tx = nx; ty = ny;
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          heroGlow.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+          raf = null;
+        });
+      }
+    }, { passive: true });
+  }
+
   const revealEls = document.querySelectorAll('[data-reveal]');
   if (revealEls.length) {
     const io = new IntersectionObserver(
@@ -917,11 +968,21 @@
   // =============================================================
   const FONTS = {
     'hanken':        { label: 'Hanken Grotesk',     stack: "'Hanken Grotesk', 'Inter', system-ui, sans-serif", note: 'professional · default' },
-    'jakarta':       { label: 'Plus Jakarta Sans',  stack: "'Plus Jakarta Sans', system-ui, sans-serif",       note: 'corporate · trusted' },
-    'sora':          { label: 'Sora',               stack: "'Sora', system-ui, sans-serif",                    note: 'geometric · sharp' },
-    'geist':         { label: 'Geist',              stack: "'Geist', 'Inter', system-ui, sans-serif",          note: 'neutral · clean' },
-    'space-grotesk': { label: 'Space Grotesk',      stack: "'Space Grotesk', system-ui, sans-serif",           note: 'tech · confident' },
-    'manrope':       { label: 'Manrope',            stack: "'Manrope', system-ui, sans-serif",                 note: 'soft · modern' },
+    'jakarta':       { label: 'Plus Jakarta Sans',  stack: "'Plus Jakarta Sans', system-ui, sans-serif",       note: 'corporate · trusted', gf: 'Plus+Jakarta+Sans:wght@300..800' },
+    'sora':          { label: 'Sora',               stack: "'Sora', system-ui, sans-serif",                    note: 'geometric · sharp',   gf: 'Sora:wght@300..700' },
+    'geist':         { label: 'Geist',              stack: "'Geist', 'Inter', system-ui, sans-serif",          note: 'neutral · clean',     gf: 'Geist:wght@300..700' },
+    'space-grotesk': { label: 'Space Grotesk',      stack: "'Space Grotesk', system-ui, sans-serif",           note: 'tech · confident',    gf: 'Space+Grotesk:wght@400..700' },
+    'manrope':       { label: 'Manrope',            stack: "'Manrope', system-ui, sans-serif",                 note: 'soft · modern',       gf: 'Manrope:wght@300..800' },
+  };
+  // Tweak fonts are loaded on demand — the main bundle ships only the production families.
+  const loadTweakFont = (key) => {
+    const f = FONTS[key];
+    if (!f || !f.gf || document.getElementById('tweak-font-' + key)) return;
+    const link = document.createElement('link');
+    link.id = 'tweak-font-' + key;
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=' + f.gf + '&display=swap';
+    document.head.appendChild(link);
   };
   const ACCENTS = {
     'blue':    { label: 'Blue',   clay: '34 98 240',  clayDeep: '26 76 200',  claySoft: '188 211 255', clayWash: '237 243 255' },
@@ -950,6 +1011,7 @@
   // Apply on load
   const apply = () => {
     const root = document.documentElement.style;
+    loadTweakFont(state.font);
     root.setProperty('--font-display', FONTS[state.font]?.stack || FONTS.hanken.stack);
     root.setProperty('--font-accent', FONTS[state.font]?.stack || FONTS.hanken.stack);
     root.setProperty('--display-tracking', TYPE_SCALE[state.tracking]?.value || TYPE_SCALE.tight.value);
