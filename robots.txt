@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /corrispondenza-cliente.html
+Disallow: /login.html
 
-Sitemap: https://example.com/sitemap.xml
+Sitemap: https://www.businessinflorida.it/sitemap.xml
